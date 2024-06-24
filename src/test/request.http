@@ -2,7 +2,7 @@ GET http://localhost:9999/api/posts
 
 ###
 
-GET http://localhost:9999/api/posts/4
+GET http://localhost:9999/api/posts/3
 
 ###
 
@@ -11,7 +11,8 @@ Content-Type: application/json
 
 {
   "id": 0,
-  "content": "Last Post"
+  "content": "Last Post",
+  "removed": false
 }
 
 ###
@@ -21,7 +22,8 @@ Content-Type: application/json
 
 {
   "id": 3,
-  "content": "Edit Post"
+  "content": "Edit Post",
+  "removed": false
 }
 
 ###
