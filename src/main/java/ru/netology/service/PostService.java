@@ -18,7 +18,7 @@ public class PostService {
         return repository.all();
     }
 
-    public Post getById(long id) {
+    public Object getById(long id) {
         return repository.getById(id);
     }
 

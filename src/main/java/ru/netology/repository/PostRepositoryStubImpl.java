@@ -1,14 +1,16 @@
 package ru.netology.repository;
 
 import org.springframework.stereotype.Repository;
+import ru.netology.exception.NotFoundException;
 import ru.netology.model.Post;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 @Repository
-public class PostRepositoryStubImpl implements PostRepository{
+public class PostRepositoryStubImpl implements PostRepository {
     static Map<Long, Post> posts = new ConcurrentHashMap<>();
     static AtomicLong index = new AtomicLong(10L);
 
@@ -22,13 +24,19 @@ public class PostRepositoryStubImpl implements PostRepository{
 
 
     public Map<Long, Post> all() {
-
-        return posts; //Collections.emptyList();
+        return posts.keySet()
+                .stream()
+                .filter(id -> !posts.get(id).getRemoved())
+                .collect(Collectors.toMap(id -> id, id -> posts.get(id), (a, b) -> b, ConcurrentHashMap::new)); //Collections.emptyList();
     }
 
 
-    public Post getById(long id) {
-        return posts.get(id);
+    public Object getById(long id) {
+        if (posts.containsKey(id) && !posts.get(id).getRemoved()) {
+            return posts.get(id);
+        }
+        throw new NotFoundException("There is no sush id");
+        //return null;
     }
 
     /*
@@ -47,9 +55,11 @@ public class PostRepositoryStubImpl implements PostRepository{
             posts.put(post.getId(), post);
         } else {
             int help = 0;
-            if (posts.containsKey(post.getId())) {
+            if (posts.containsKey(post.getId()) && !posts.get(post.getId()).getRemoved()) {
                 help = 1;
                 posts.put(post.getId(), post);
+            } else if (posts.containsKey(post.getId()) && posts.get(post.getId()).getRemoved()) {
+                throw new NotFoundException("There is no sush id");
             }
             if (help == 0) {
                 post.setId(index.getAndIncrement());
@@ -61,6 +71,13 @@ public class PostRepositoryStubImpl implements PostRepository{
 
 
     public void removeById(long id) {
-        posts.remove(id);
+        //posts.remove(id);
+        if (posts.containsKey(id)) {
+            Post post = posts.get(id);
+            if (!post.getRemoved()) {
+                post.setRemoved();
+                posts.put(id, post);
+            }
+        }
     }
 }

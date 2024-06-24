@@ -1,16 +1,13 @@
 package ru.netology.repository;
 
 import ru.netology.model.Post;
-
 import java.util.Map;
-
-
 
 public interface PostRepository {
 
     Map<Long, Post> all();
 
-    Post getById(long id);
+    Object getById(long id);
 
     Post save(Post post);
 
